@@ -1,0 +1,102 @@
+#include <stdio.h>
+
+double first_order_differential_equation(double x, double y) {
+    return x - y;
+}
+
+double second_order_equation_y(double x, double y, double z) {
+    return z;
+}
+
+double second_order_equation_z(double x, double y, double z) {
+    return -y;
+}
+
+void runge_kutta_4th_order_first_order(double (*f)(double, double), double x0, double y0, double h, int num_steps) {
+    double x = x0;
+    double y = y0;
+    
+    printf("Solução da EDO de primeira ordem:\n");
+    for (int i = 0; i <= num_steps; i++) {
+        printf("x = %.2f, y = %.6f\n", x, y);
+        
+        double k1 = h * f(x, y);
+        double k2 = h * f(x + h/2, y + k1/2);
+        double k3 = h * f(x + h/2, y + k2/2);
+        double k4 = h * f(x + h, y + k3);
+        
+        y = y + (k1 + 2*k2 + 2*k3 + k4) / 6;
+        x = x + h;
+    }
+}
+
+void runge_kutta_4th_order_second_order(double (*f)(double, double, double), double (*g)(double, double, double),
+                                       double x0, double y0, double z0, double h, int num_steps) {
+    double x = x0;
+    double y = y0;
+    double z = z0;
+    
+    printf("Solução da EDO de segunda ordem:\n");
+    for (int i = 0; i <= num_steps; i++) {
+        printf("x = %.2f, y = %.6f, z = %.6f\n", x, y, z);
+        
+        double k1_y = h * z;
+        double k1_z = h * f(x, y, z);
+        double k2_y = h * (z + k1_z/2);
+        double k2_z = h * f(x + h/2, y + k1_y/2, z + k1_z/2);
+        double k3_y = h * (z + k2_z/2);
+        double k3_z = h * f(x + h/2, y + k2_y/2, z + k2_z/2);
+        double k4_y = h * (z + k3_z);
+        double k4_z = h * f(x + h, y + k3_y, z + k3_z);
+        
+        y = y + (k1_y + 2*k2_y + 2*k3_y + k4_y) / 6;
+        z = z + (k1_z + 2*k2_z + 2*k3_z + k4_z) / 6;
+        x = x + h;
+    }
+}
+
+int main() {
+    int choice;
+    
+    printf("Escolha o tipo de equação diferencial:\n");
+    printf("1. Equação de primeira ordem\n");
+    printf("2. Equação de segunda ordem\n");
+    printf("Digite o número da sua escolha: ");
+    scanf("%d", &choice);
+    
+    if (choice == 1) {
+        double x0, y0, h;
+        int num_steps;
+        
+        printf("Informe o valor inicial de x: ");
+        scanf("%lf", &x0);
+        printf("Informe o valor inicial de y: ");
+        scanf("%lf", &y0);
+        printf("Informe o tamanho do passo (h): ");
+        scanf("%lf", &h);
+        printf("Informe o número de passos: ");
+        scanf("%d", &num_steps);
+        
+        runge_kutta_4th_order_first_order(first_order_differential_equation, x0, y0, h, num_steps);
+    } else if (choice == 2) {
+        double x0, y0, z0, h;
+        int num_steps;
+        
+        printf("Informe o valor inicial de x: ");
+        scanf("%lf", &x0);
+        printf("Informe o valor inicial de y: ");
+        scanf("%lf", &y0);
+        printf("Informe o valor inicial de z: ");
+        scanf("%lf", &z0);
+        printf("Informe o tamanho do passo (h): ");
+        scanf("%lf", &h);
+        printf("Informe o número de passos: ");
+        scanf("%d", &num_steps);
+        
+        runge_kutta_4th_order_second_order(second_order_equation_y, second_order_equation_z, x0, y0, z0, h, num_steps);
+    } else {
+        printf("Opção inválida.\n");
+    }
+    
+    return 0;
+}
